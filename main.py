@@ -1,9 +1,9 @@
 import os
 import subprocess
+import imghdr
 import tempfile
 
 import flask
-import imghdr
 from marshmallow import ValidationError
 from google.cloud import storage
 
