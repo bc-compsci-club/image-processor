@@ -26,6 +26,7 @@ def process(request):
     """
     req_json = request.get_json()
 
+    # Validate request body
     try:
         schema = request_schema.RequestSchema()
         schema.load(data=req_json)
@@ -33,10 +34,19 @@ def process(request):
         print(err.messages)
         return flask.abort(400, err.messages)
 
+    # File and directory variables
     image_file_name = req_json["inputFileGcs"].split("/")[-1]
-    image_path = os.path.join(tempfile.gettempdir(), image_file_name)
-    processed_image_path = os.path.join(
-        tempfile.gettempdir(), 'processed', image_file_name)
+    image_dir = os.path.join(tempfile.gettempdir(), 'to-process')
+    image_path = os.path.join(image_dir, image_file_name)
+    processed_image_dir = os.path.join(tempfile.gettempdir(), "processed")
+    processed_image_path = os.path.join(processed_image_dir, image_file_name)
+
+    # Create used directories if they don't exist
+    if not os.path.isdir(image_dir):
+        os.mkdir(image_dir)
+
+    if not os.path.isdir(processed_image_dir):
+        os.mkdir(processed_image_dir)
 
     # Download image from Google Cloud Storage
     download_blob = bucket.blob(req_json["inputFileGcs"])
